@@ -38,6 +38,9 @@
 - (void)didDoubleTapOnPage:(int)page atPoint:(CGPoint)point;
 - (void)didLongPressOnPage:(int)page atPoint:(CGPoint)point;
 - (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point;
+
+- (void)popViewController;
+- (void)didUnselectAnnotation;
 @end;
 
 //---------------------------------------------------------
@@ -127,7 +130,7 @@
 @property (strong, nonatomic) UIImage *prevImage;
 @property (strong, nonatomic) UIImage *nextImage;
 @property (strong, nonatomic) UIImage *performImage;
-@property (strong, nonatomic) UIImage *drawImage;
+//@property (strong, nonatomic) UIImage *drawImage;
 @property (strong, nonatomic) UIImage *selImage;
 @property (strong, nonatomic) UIImage *undoImage;
 @property (strong, nonatomic) UIImage *redoImage;
@@ -176,6 +179,33 @@
 @property (assign, nonatomic)int pagecount;
 @property (assign, nonatomic)int pagenow;
 @property (assign,nonatomic) PopupMenu* popupMenu;
+
+- (void)closeView;
+- (void)showViewModeTableView;
+- (void)showDrawModeTableView;
+- (void)drawRow;
+- (void)drawRowDone;
+- (void)drawRowCancel;
+- (void)drawNote;
+- (void)drawNoteDone;
+- (void)drawImage;
+- (void)drawImageDone;
+- (void)drawImageCancel;
+- (void)bookmarkList;
+- (void)toggleGridView;
+- (void)undoAnnot;
+- (void)redoAnnot;
+- (void)savePdf;
+- (void)printPdf;
+- (void)highlightText;
+- (void)underlineText;
+- (void)strikeText;
+- (void)modifyTextDone;
+- (void)performAnnot;
+- (void)deleteAnnot;
+- (void)annotCancel;
+- (NSArray *)getAllAnnotations;
+
 - (IBAction)composeFile:(id) sender;
 - (IBAction)searchView:(id) sender;
 - (IBAction)drawLine:(id) sender;

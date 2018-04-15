@@ -45,7 +45,7 @@ static PDF_RECT mSecondParaRectOrg;
     //parse backword till arrive to the paragraph start
     [mCurrentPage objsCharRect:mPrevIndex :&mCurrCharRect];
     [mCurrentPage objsCharRect:mPrevIndex -1 :&mNextCharRect];
-    double mFontHeightDiff = abs((mNextCharRect.bottom - mNextCharRect.top) - mCharHeight);
+    double mFontHeightDiff = fabsf((mNextCharRect.bottom - mNextCharRect.top) - mCharHeight);
     while ((mFontHeightDiff < 0.4 || (mFontHeightDiff > 4 && mFontHeightDiff < 5)) && mPrevIndex >= 0) {
         if(zoom && [[mCurrentPage objsString:mPrevIndex -3 :mPrevIndex] isEqualToString:@".\r\n"]) //in case of zoom, read only one paragraph
             break;
@@ -61,18 +61,18 @@ static PDF_RECT mSecondParaRectOrg;
         if (mPrevIndex > 0) {
             [mCurrentPage objsCharRect:mPrevIndex -1 :&mNextCharRect];
         }
-        if ((mNextCharRect.right - mCurrCharRect.left) < -10 && abs(mNextCharRect.top - mCurrCharRect.top) > 10 && !mDividedByColumns) {
+        if ((mNextCharRect.right - mCurrCharRect.left) < -10 && fabsf(mNextCharRect.top - mCurrCharRect.top) > 10 && !mDividedByColumns) {
             mDividedByColumns = true; //paragraph is divided in 2 columns
         }
         
-        mFontHeightDiff = abs(mNextCharRect.bottom - mNextCharRect.top) - mCharHeight;
+        mFontHeightDiff = fabsf(mNextCharRect.bottom - mNextCharRect.top) - mCharHeight;
     }
     
     //parse foreword till arrive to the paragraph end
     mDividedByColumns = false;
     [mCurrentPage objsCharRect:mNextIndex :&mCurrCharRect];
     [mCurrentPage objsCharRect:mNextIndex + 1 :&mNextCharRect];
-    mFontHeightDiff = abs((mNextCharRect.bottom - mNextCharRect.top) - mCharHeight);
+    mFontHeightDiff = fabsf((mNextCharRect.bottom - mNextCharRect.top) - mCharHeight);
     while ((mFontHeightDiff < 0.4 || (mFontHeightDiff > 4 && mFontHeightDiff < 5)) && mNextIndex <= [mCurrentPage objsCount] - 1)
     {
         if(zoom && [[mCurrentPage objsString:mNextIndex :mNextIndex +3] isEqualToString:@".\r\n"]) //in case of zoom, read only one paragraph
@@ -89,10 +89,10 @@ static PDF_RECT mSecondParaRectOrg;
         if (mNextIndex < ([mCurrentPage objsCount] -1)) {
             [mCurrentPage objsCharRect:mNextIndex +1 :&mNextCharRect];
         }
-        if((mNextCharRect.left - mCurrCharRect.right) > 10 && abs(mNextCharRect.top - mCurrCharRect.top) > 10 && !mDividedByColumns) //paragraph is divided in 2 columns
+        if((mNextCharRect.left - mCurrCharRect.right) > 10 && fabsf(mNextCharRect.top - mCurrCharRect.top) > 10 && !mDividedByColumns) //paragraph is divided in 2 columns
             mDividedByColumns = true;
         
-        mFontHeightDiff = abs((mNextCharRect.bottom - mNextCharRect.top) - mCharHeight);
+        mFontHeightDiff = fabsf((mNextCharRect.bottom - mNextCharRect.top) - mCharHeight);
     }
     
     if (zoom) {

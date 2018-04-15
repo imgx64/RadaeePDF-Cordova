@@ -19,7 +19,8 @@
 @interface RadaeePDFPlugin : CDVPlugin{
     CDVInvokedUrlCommand* cdv_command;
     RDPDFViewController *m_pdf;
-    
+    UIViewController *m_childvc;
+
     NSURLConnection *pdfConn;
     NSString *url;
     NSMutableData *receivedData;
@@ -66,6 +67,7 @@
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didDoubleTapOnPage;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didLongPressOnPage;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didTapOnAnnotationOfType;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didUnselectAnnotation;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_onAnnotExported;
 
 @property (nonatomic) int viewMode;
@@ -115,6 +117,54 @@
 - (void)addAnnotAttachment:(CDVInvokedUrlCommand *)command;
 - (void)renderAnnotToFile:(CDVInvokedUrlCommand *)command;
 
+// Actions
+- (void)setTopSpace:(CDVInvokedUrlCommand*)command;
+- (void)close:(CDVInvokedUrlCommand*)command;
+- (void)hide:(CDVInvokedUrlCommand*)command;
+- (void)unhide:(CDVInvokedUrlCommand*)command;
+- (void)showDrawMenu:(CDVInvokedUrlCommand*)command;
+- (void)searchStart:(CDVInvokedUrlCommand*)command;
+- (void)searchNext:(CDVInvokedUrlCommand*)command;
+- (void)searchPrev:(CDVInvokedUrlCommand*)command;
+- (void)searchEnd:(CDVInvokedUrlCommand*)command;
+- (void)showOutlineMenu:(CDVInvokedUrlCommand*)command;
+- (void)showBookmarksMenu:(CDVInvokedUrlCommand*)command;
+- (void)showGridView:(CDVInvokedUrlCommand*)command;
+- (void)undo:(CDVInvokedUrlCommand*)command;
+- (void)redo:(CDVInvokedUrlCommand*)command;
+- (void)bookmarkCurrentPage:(CDVInvokedUrlCommand*)command;
+- (void)print:(CDVInvokedUrlCommand*)command;
+- (void)save:(CDVInvokedUrlCommand*)command;
+- (void)showViewModeMenu:(CDVInvokedUrlCommand*)command;
+
+- (void)drawFreeformStart:(CDVInvokedUrlCommand*)command;
+- (void)drawFreeformEnd:(CDVInvokedUrlCommand*)command;
+- (void)drawFreeformCancel:(CDVInvokedUrlCommand*)command;
+- (void)drawFreeformSetColor:(CDVInvokedUrlCommand*)command;
+- (void)drawFreeformSetWidth:(CDVInvokedUrlCommand*)command;
+- (void)drawNoteStart:(CDVInvokedUrlCommand*)command;
+- (void)drawNoteEnd:(CDVInvokedUrlCommand*)command;
+- (void)modifyTextHighlightStart:(CDVInvokedUrlCommand*)command;
+- (void)modifyTextHighlightSetColor:(CDVInvokedUrlCommand*)command;
+- (void)modifyTextUnderlineStart:(CDVInvokedUrlCommand*)command;
+- (void)modifyTextUnderlineSetColor:(CDVInvokedUrlCommand*)command;
+- (void)modifyTextStriketrhoughStart:(CDVInvokedUrlCommand*)command;
+- (void)modifyTextStriketrhoughSetColor:(CDVInvokedUrlCommand*)command;
+- (void)modifyTextEnd:(CDVInvokedUrlCommand*)command;
+- (void)drawLinesStart:(CDVInvokedUrlCommand*)command;
+- (void)drawLinesEnd:(CDVInvokedUrlCommand*)command;
+- (void)drawLinesCancel:(CDVInvokedUrlCommand*)command;
+- (void)drawLinesSetColor:(CDVInvokedUrlCommand*)command;
+- (void)drawLinesSetWidth:(CDVInvokedUrlCommand*)command;
+- (void)drawStampStart:(CDVInvokedUrlCommand*)command;
+- (void)drawStampEnd:(CDVInvokedUrlCommand*)command;
+- (void)drawStampCancel:(CDVInvokedUrlCommand*)command;
+- (void)getAllAnnotations:(CDVInvokedUrlCommand*)command;
+- (void)SelectedAnnotationDoAction:(CDVInvokedUrlCommand*)command;
+- (void)SelectedAnnotationDelete:(CDVInvokedUrlCommand*)command;
+- (void)SelectedAnnotationUnselect:(CDVInvokedUrlCommand*)command;
+- (void)gotoPage:(CDVInvokedUrlCommand*)command;
+
 // Form Manager
 
 - (void)JSONFormFields:(CDVInvokedUrlCommand*)command;
@@ -123,14 +173,14 @@
 - (void)setFormFieldWithJSON:(CDVInvokedUrlCommand *)command;
 
 // FTS Methods
+#ifdef FTS_ENABLED
 - (void)FTS_SetIndexDB:(CDVInvokedUrlCommand*)command;
 - (void)FTS_AddIndex:(CDVInvokedUrlCommand*)command;
 - (void)FTS_RemoveFromIndex:(CDVInvokedUrlCommand*)command;
 - (void)FTS_Search:(CDVInvokedUrlCommand*)command;
 - (void)SetSearchType:(CDVInvokedUrlCommand*)command;
 - (void)GetSearchType:(CDVInvokedUrlCommand*)command;
-
-+ (RadaeePDFPlugin *)pluginInit;
+#endif
 
 // Bookmarks
 - (void)addToBookmarks:(CDVInvokedUrlCommand *)command;//(NSString *)pdfPath page:(int)page label:(NSString *)label;
@@ -159,6 +209,11 @@
 - (void)didDoubleTapOnPageCallback:(CDVInvokedUrlCommand *)command;
 - (void)didLongPressOnPageCallback:(CDVInvokedUrlCommand *)command;
 - (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command;
+- (void)didUnselectAnnotationCallback:(CDVInvokedUrlCommand *)command;
 - (void)onAnnotExportedCallback:(CDVInvokedUrlCommand *)command;
+
+- (UIViewController *)getCordovaViewController;
+- (void)setChildVcTopSpace;
+- (void)rotated;
 
 @end

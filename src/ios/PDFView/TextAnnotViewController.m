@@ -40,7 +40,9 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    UILabel *subjectLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height + 15, 90, 50)];
+    CGFloat topbarHeight = ([UIApplication sharedApplication].statusBarFrame.size.height +  (self.navigationController.navigationBar.frame.size.height ?: 0.0));
+
+    UILabel *subjectLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, topbarHeight + 15, 90, 50)];
     subjectLabel.text = @"Subject:";
     subjectLabel.textAlignment = NSTextAlignmentCenter;
     

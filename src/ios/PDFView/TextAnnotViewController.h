@@ -18,7 +18,6 @@
     id<saveTextAnnotDelegate> m_delegate;
     UITextField *textField;
     UITextView *textView;
-    NSString* text;
 }
 @property(readwrite) int pos_x;
 @property(readwrite) int pos_y;

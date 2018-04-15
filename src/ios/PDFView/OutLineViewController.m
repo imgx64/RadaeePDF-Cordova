@@ -113,7 +113,7 @@ struct OUTLINE_ITEM
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
-    int row = [indexPath row];
+    NSInteger row = [indexPath row];
 	OUTLINE_ITEM *otl = [self.arForTable objectAtIndex:row];
     
 	cell.textLabel.text=otl.label;
@@ -136,7 +136,7 @@ struct OUTLINE_ITEM
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
-    int row = [indexPath row];
+    NSInteger row = [indexPath row];
 	OUTLINE_ITEM *otl = [self.arForTable objectAtIndex:row];
     UINavigationController *nav = m_jump.navigationController;
     int pageno = [otl dest];
@@ -151,7 +151,7 @@ struct OUTLINE_ITEM
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    int row = [indexPath row];
+    NSInteger row = [indexPath row];
 	OUTLINE_ITEM *otl = [self.arForTable objectAtIndex:row];
     
     if( otl.child)

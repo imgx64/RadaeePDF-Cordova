@@ -13,21 +13,15 @@
 #pragma mark - Synthesize
 
 @interface RadaeePDFPlugin() <RDPDFViewControllerDelegate>
-
+{
+    CGFloat topSpace;
+}
 @end
 
 @implementation RadaeePDFPlugin
 @synthesize cdv_command;
 
 #pragma mark - Cordova Plugin
-
-+ (RadaeePDFPlugin *)pluginInit
-{
-    RadaeePDFPlugin *r = [[RadaeePDFPlugin alloc] init];
-    [r pluginInitialize];
-    
-    return r;
-}
 
 - (void)pluginInitialize
 {
@@ -38,6 +32,9 @@
     highlightColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
     ovalColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"OvalColor"];
     selColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SelColor"];
+    topSpace = 0.0;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rotated) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 #pragma mark - Plugin API
@@ -418,16 +415,7 @@
 - (void)showReader
 {
     [self pdfChargeDidFinishLoading];
-    
-    //toggle thumbnail/seekbar
-    if (bottomBar < 1){
-        [m_pdf setThumbHeight:(thumbHeight > 0) ? thumbHeight : 50];
-        [m_pdf PDFThumbNailinit:1];
-        [m_pdf setThumbnailBGColor:thumbBackgroundColor];
-    }
-    else
-        [m_pdf PDFSeekBarInit:1];
-    
+
     [m_pdf setReaderBGColor:readerBackgroundColor];
     
     //Set thumbGridView
@@ -437,24 +425,52 @@
     [m_pdf setThumbGridViewMode:gridMode];
     
     m_pdf.hidesBottomBarWhenPushed = YES;
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:m_pdf];
     
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:m_pdf];
+
     if (titleBackgroundColor != 0) {
         navController.navigationBar.barTintColor = UIColorFromRGB(titleBackgroundColor);
     } else {
         navController.navigationBar.barTintColor = [UIColor blackColor];
     }
-    
+
     if (iconsBackgroundColor != 0) {
         navController.navigationBar.tintColor = UIColorFromRGB(iconsBackgroundColor);
     } else {
         navController.navigationBar.tintColor = [UIColor orangeColor];
     }
-    
+
     [navController.navigationBar setTranslucent:NO];
+
+    //[self.viewController presentViewController:navController animated:YES completion:nil];
     
-    [self.viewController presentViewController:navController animated:YES completion:nil];
+    m_childvc = navController;
+    
+    UIViewController *cvc = [self getCordovaViewController];
+
+    UIView *view = m_childvc.view;
+
+    [cvc addChildViewController:m_childvc];
+    [cvc.view addSubview:view];
+    [cvc.view bringSubviewToFront:view];
+    [cvc.view layoutIfNeeded];
+
+    [m_childvc didMoveToParentViewController:cvc];
+    
+    [self setChildVcTopSpace];
+    
+    //toggle thumbnail/seekbar
+    if (bottomBar < 1){
+        [m_pdf setThumbHeight:(thumbHeight > 0) ? thumbHeight : 50];
+        [m_pdf PDFThumbNailinit:1];
+        [m_pdf setThumbnailBGColor:thumbBackgroundColor];
+    }
+    else {
+        [m_pdf PDFSeekBarInit:1];
+    }
 }
+
+
 
 - (void)extractTextFromPage:(CDVInvokedUrlCommand *)command
 {
@@ -670,38 +686,490 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+#pragma mark - Actions
+
+- (void)setTopSpace:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *num = [params objectForKey:@"topSpace"];
+    topSpace = [num doubleValue];
+
+    if(m_childvc != nil) {
+        [self setChildVcTopSpace];
+    }
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)close:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf closeView];
+}
+
+- (void)hide:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+
+    UIView *view = m_childvc.view;
+    UIViewController *cvc = [self getCordovaViewController];
+    [cvc.view sendSubviewToBack:view];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)unhide:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+
+    UIView *view = m_childvc.view;
+    UIViewController *cvc = [self getCordovaViewController];
+    [cvc.view bringSubviewToFront:view];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)showDrawMenu:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf showDrawModeTableView];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)searchStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf searchView:nil];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)searchNext:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+
+    [m_pdf m_searchBar].text = [params objectForKey:@"searchTerm"];
+    [m_pdf nextword:nil];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)searchPrev:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+
+    [m_pdf m_searchBar].text = [params objectForKey:@"searchTerm"];
+    [m_pdf prevword:nil];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)searchEnd:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+
+    [m_pdf searchCancel:nil];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)showOutlineMenu:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf viewMenu:nil];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)showBookmarksMenu:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf bookmarkList];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)undo:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf undoAnnot];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)redo:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf redoAnnot];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)bookmarkCurrentPage:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf composeFile:nil];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)print:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf printPdf];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)save:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf savePdf];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)showViewModeMenu:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf showViewModeTableView];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)showGridView:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf toggleGridView];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawFreeformStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawLine:nil];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawFreeformEnd:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawLineDone:nil];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawFreeformCancel:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawLineCancel:nil];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawFreeformSetColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *color = [params objectForKey:@"color"];
+    // TODO: NSUserDefault
+    g_ink_color = [self addAlpha:[color unsignedIntValue]];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawFreeformSetWidth:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *width = [params objectForKey:@"width"];
+    // TODO: NSUserDefault
+    g_Ink_Width = [width floatValue];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawNoteStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawNote];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawNoteEnd:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawNoteDone];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)modifyTextHighlightStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf highlightText];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)modifyTextHighlightSetColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *color = [params objectForKey:@"color"];
+    // TODO: NSUserDefault
+    annotHighlightColor = [self addAlpha:[color unsignedIntValue]];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)modifyTextUnderlineStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf underlineText];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)modifyTextUnderlineSetColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *color = [params objectForKey:@"color"];
+    // TODO: NSUserDefault
+    annotUnderlineColor = [self addAlpha:[color unsignedIntValue]];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)modifyTextStriketrhoughStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf strikeText];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)modifyTextStriketrhoughSetColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *color = [params objectForKey:@"color"];
+    // TODO: NSUserDefault
+    annotStrikeoutColor = [self addAlpha:[color unsignedIntValue]];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)modifyTextEnd:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf modifyTextDone];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+
+- (void)drawLinesStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawRow];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawLinesEnd:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawRowDone];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawLinesCancel:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawRowCancel];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawLinesSetColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *color = [params objectForKey:@"color"];
+    // TODO: NSUserDefault
+    g_line_color = [self addAlpha:[color unsignedIntValue]];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawLinesSetWidth:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSNumber *width = [params objectForKey:@"width"];
+    // TODO: NSUserDefault
+    g_line_Width = [width floatValue];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawStampStart:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawImage];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawStampEnd:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawImageDone];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)drawStampCancel:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf drawImageCancel];
+
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)getAllAnnotations:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSArray *annotations = [m_pdf getAllAnnotations];
+    
+    [self cdvOkWithArray:annotations];
+}
+
+- (void)SelectedAnnotationDoAction:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf performAnnot];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)SelectedAnnotationDelete:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf deleteAnnot];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)SelectedAnnotationUnselect:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf annotCancel];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)gotoPage:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+
+    int page = [[params objectForKey:@"page"] intValue];
+    [m_pdf PDFGoto:page];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
 #pragma mark - Bookmarks
 
 - (void)addToBookmarks:(CDVInvokedUrlCommand *)command
 {
     self.cdv_command = command;
-    
+
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
-    
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"];  //[params objectForKey:@"pdfPath"];
-    
+
+    // NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"];
+    // NSString *path = [params objectForKey:@"pdfPath"];
+    NSString *path = pdfPath;
+
     [self cdvOkWithMessage:[RadaeePDFPlugin addToBookmarks:path page:[[params objectForKey:@"page"] intValue] label:[params objectForKey:@"label"]]];
 }
 
 - (void)removeBookmark:(CDVInvokedUrlCommand *)command
 {
     self.cdv_command = command;
-    
+
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
-    
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"]; //[params objectForKey:@"pdfPath"];
-    
+
+    // NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"];
+    // NSString *path = [params objectForKey:@"pdfPath"];
+    NSString *path = pdfPath;
+
     [RadaeePDFPlugin removeBookmark:[[params objectForKey:@"page"] intValue] pdfPath:path];
 }
 
 - (void)getBookmarks:(CDVInvokedUrlCommand *)command
 {
     self.cdv_command = command;
-    
-    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
-    
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"]; //[params objectForKey:@"pdfPath"];
-    
+
+    // NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+
+    // NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"];
+    // NSString *path = [params objectForKey:@"pdfPath"];
+    NSString *path = pdfPath;
+
     [self cdvOkWithMessage:[RadaeePDFPlugin getBookmarks:path]];
 }
 
@@ -744,9 +1212,15 @@
 {
     self.cdv_didLongPressOnPage = command;
 }
+
 - (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command
 {
     self.cdv_didTapOnAnnotationOfType = command;
+}
+
+- (void)didUnselectAnnotationCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didUnselectAnnotation = command;
 }
 
 - (void)onAnnotExportedCallback:(CDVInvokedUrlCommand *)command
@@ -908,6 +1382,13 @@
 - (void)cdvOkWithMessage:(NSString *)message
 {
     CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
+    [res setKeepCallback:0];
+    [self.commandDelegate sendPluginResult:res callbackId:[self.cdv_command callbackId]];
+}
+
+- (void)cdvOkWithArray:(NSArray *)message
+{
+    CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:message];
     [res setKeepCallback:0];
     [self.commandDelegate sendPluginResult:res callbackId:[self.cdv_command callbackId]];
 }
@@ -1076,7 +1557,10 @@
         [_delegate didCloseReader];
     }
     */
-    
+
+    // For current 'close' success callback
+    [self cdvOkWithMessage:@"success"];
+
     [self cdvSendCallback:@"" orCommand:self.cdv_didCloseReader];
 }
 
@@ -1133,9 +1617,25 @@
     [self cdvSendDictCallback:@{@"index": [NSNumber numberWithInt:page], @"type": [NSNumber numberWithInt:type]} orCommand:self.cdv_didTapOnAnnotationOfType];
 }
 
+- (void)didUnselectAnnotation
+{
+    [self cdvSendCallback:@"" orCommand:self.cdv_didUnselectAnnotation];
+}
+
 - (void)onAnnotExported:(NSString *)path
 {
     [self cdvSendCallback:path orCommand:self.cdv_onAnnotExported];
+}
+
+- (void)popViewController
+{
+    UIViewController *cvc = [self getCordovaViewController];
+    
+    [m_childvc removeFromParentViewController];
+    [m_childvc.view removeFromSuperview];
+    [cvc.view layoutIfNeeded];
+    
+    m_childvc = nil;
 }
 
 #pragma mark - Path Utils
@@ -1169,6 +1669,48 @@
     }
     
     return res;
+}
+
+- (UIViewController *)getCordovaViewController
+{
+    // Hack to get the Cordova ViewController
+    UIResponder *responder = self.webView;
+    while ([responder isKindOfClass:[UIView class]])
+        responder = [responder nextResponder];
+    UIViewController *cvc = (UIViewController *)responder;
+    return cvc;
+}
+
+- (void)setChildVcTopSpace
+{
+    CGSize statusBarSize = [[UIApplication sharedApplication] statusBarFrame].size;
+    CGFloat statusbarHeight = MIN(statusBarSize.width, statusBarSize.height);
+    
+    UIViewController *cvc = [self getCordovaViewController];
+    CGRect frame = cvc.view.frame;
+    frame.origin.y += statusbarHeight + topSpace;
+    frame.size.height -= statusbarHeight + topSpace;
+
+    UIView *view = m_childvc.view;
+    view.frame = frame;
+    view.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+    
+    [cvc.view layoutIfNeeded];
+}
+
+- (void)rotated
+{
+    [self setChildVcTopSpace];
+}
+
+- (uint) addAlpha:(uint) color {
+    if (color & 0xFF000000) {
+        // color already has alpha
+        return color;
+    } else {
+        // No alpha, make it opaque
+        return color | 0xFF000000;
+    }
 }
 
 @end

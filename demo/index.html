@@ -1,25 +1,8 @@
 <!DOCTYPE html>
-<!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
 <html>
-    <head>
-        <!--
+
+<head>
+    <!--
         Customize this policy to fit your own app's needs. For more guidance, see:
             https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
         Some notes:
@@ -28,28 +11,108 @@
             * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
                 * Enable inline JS: add 'unsafe-inline' to default-src
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://codepush.azurewebsites.net/ data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
-        <title>Hello World</title>
-    </head>
-    <body>
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">
-                    <button id="activateLicense" style="height:30px;">ACTIVATE LICENSE</button><br/><br/>
-                    <button id="open" style="height:30px;">OPEN</button><br/><br/>
-                    <button id="openHttp" style="height:30px;">OPEN HTTP</button><br/><br/>
-                    <button id="openFromAssets" style="height:30px;">OPEN FROM ASSETS</button>
-                </p>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://codepush.azurewebsites.net/ data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <title>RadeePDF</title>
+</head>
 
-            </div>
+<body>
+    <div class="toolbar">
+        <div id="main-toolbar" class="toolbar-inner hide">
+            <img id="close" class="toolbar-item" src="img/close.png">
+            <img id="edit-annotation" class="toolbar-item" src="img/edit-annotation.png">
+            <img id="search" class="toolbar-item" src="img/search.png">
+            <img id="annotations-bookmarks" class="toolbar-ite " src="img/annotations-bookmarks.png">
+            <img id="outline-bookmarks" class="toolbar-ite " src="img/outline-bookmarks.png">
+            <img id="rotate-left" class="toolbar-item unimplemented" src="img/rotate-left.png">
+            <img id="rotate-right" class="toolbar-item unimplemented" src="img/rotate-right.png">
+            <img id="undo-main" class="toolbar-item" src="img/undo.png">
+            <img id="redo-main" class="toolbar-item" src="img/redo.png">
+            <img id="pages-bookmarks" class="toolbar-item" src="img/pages-bookmarks.png">
+            <img id="share" class="toolbar-item" src="img/share.png">
+            <img id="settings" class="toolbar-item" src="img/settings.png">
         </div>
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-    </body>
+        <div id="search-toolbar" class="toolbar-inner hide">
+            <img class="toolbar-item" src="img/search.png">
+            <input type="search" id="search-box" class="toolbar-item search-box">
+            <img id="search-prev" class="toolbar-item" src="img/prev.png">
+            <img id="search-next" class="toolbar-item" src="img/next.png">
+            <img id="search-done" class="toolbar-item" src="img/apply.png">
+        </div>
+        <div id="annotation-toolbar" class="toolbar-inner hide">
+            <img id="thin-marker" class="toolbar-item" src="img/thin-marker.png">
+            <img id="thick-marker" class="toolbar-item unimplemented" src="img/thick-marker.png">
+            <img id="annotate-box" class="toolbar-item" src="img/annotate-box.png">
+            <img id="text-highlighter" class="toolbar-item" src="img/text-highlighter.png">
+            <img id="underline" class="toolbar-item" src="img/underline.png">
+            <img id="strikeout" class="toolbar-item" src="img/strikeout.png">
+            <img id="flat-text" class="toolbar-item unimplemented" src="img/flat-text.png">
+            <img id="annotate-box-2" class="toolbar-item" src="img/annotate-box-2.png">
+            <img id="straight-line" class="toolbar-item" src="img/straight-line.png">
+            <img id="stamp" class="toolbar-item" src="img/stamp.png">
+            <img id="signature" class="toolbar-item unimplemented" src="img/signature.png">
+            <img id="voice-note" class="toolbar-item unimplemented" src="img/voice-note.png">
+            <img id="camera" class="toolbar-item unimplemented" src="img/camera.png">
+        </div>
+        <div id="edit-toolbar" class="toolbar-inner hide">
+            <img id="edit-img" class="toolbar-item" src="">
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <img id="erase" class="toolbar-item" src="img/erase.png">
+            <img id="line-thickness" class="toolbar-item" src="img/line-thickness.png">
+            <img id="color-palette" class="toolbar-item" src="img/color-palette.png">
+            <img id="annotation-text" class="toolbar-item" src="img/annotate-box.png">
+            <img id="apply" class="toolbar-item" src="img/apply.png">
+        </div>
+        <div id="color-toolbar" class="toolbar-inner hide">
+            <img class="toolbar-item" src="img/color-palette.png">
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <div class="toolbar-item color-select" data-color="FFFFFF"></div>
+            <div class="toolbar-item color-select" data-color="C0C0C0"></div>
+            <div class="toolbar-item color-select" data-color="808080"></div>
+            <div class="toolbar-item color-select" data-color="000000"></div>
+            <div class="toolbar-item color-select" data-color="FF0000"></div>
+            <div class="toolbar-item color-select" data-color="800000"></div>
+            <div class="toolbar-item color-select" data-color="FFFF00"></div>
+            <div class="toolbar-item color-select" data-color="808000"></div>
+            <div class="toolbar-item color-select" data-color="00FF00"></div>
+            <div class="toolbar-item color-select" data-color="008000"></div>
+            <div class="toolbar-item color-select" data-color="00FFFF"></div>
+            <div class="toolbar-item color-select" data-color="008080"></div>
+            <div class="toolbar-item color-select" data-color="0000FF"></div>
+            <div class="toolbar-item color-select" data-color="000080"></div>
+            <div class="toolbar-item color-select" data-color="FF00FF"></div>
+            <div class="toolbar-item color-select" data-color="800080"></div>
+        </div>
+        <div id="thickness-toolbar" class="toolbar-inner hide">
+            <img class="toolbar-item" src="img/line-thickness.png">
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <input type="range" id="input-thickness" class="toolbar-item input-thickness"
+                value="2" min="1" max="10" step="1">
+            <img id="apply-thickness" class="toolbar-item" src="img/apply.png">
+        </div>
+    </div>
+
+    <div class="app">
+        <h1>Apache Cordova</h1>
+        <div id="deviceready" class="blink">
+            <p class="event listening">Connecting to Device</p>
+            <p class="event received">
+                <button id="activateLicense" style="height:30px;">ACTIVATE LICENSE</button>
+                <br/>
+                <br/>
+                <button id="open" style="height:30px;">OPEN</button>
+                <br/>
+                <br/>
+                <button id="openFromAssets" style="height:30px;">OPEN FROM ASSETS</button>
+            </p>
+
+        </div>
+    </div>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+</body>
+
 </html>

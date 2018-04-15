@@ -24,6 +24,7 @@ body {
     -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
     -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    user-select: none;
     background-color:#E4E4E4;
     background-image:linear-gradient(top, #A7A7A7 0%, #E4E4E4 51%);
     background-image:-webkit-linear-gradient(top, #A7A7A7 0%, #E4E4E4 51%);
@@ -43,6 +44,44 @@ body {
     padding:0px;
     text-transform:uppercase;
     width:100%;
+}
+
+.toolbar {
+    height: 40px;
+    background-color: gray;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.toolbar-inner {
+    overflow-x: auto;
+}
+
+.toolbar-item {
+    height: 40px;
+    display: inline-block;
+}
+
+.toolbar-item.search-box {
+    vertical-align: top;
+    font-size: 1.5em;
+}
+
+.toolbar-item.color-select {
+    height: 40px;
+    width: 40px;
+}
+
+.toolbar-item.input-thickness {
+    min-width: 200px;
+}
+
+.unimplemented {
+    opacity: 0.5;
+}
+
+.hide {
+    display: none;
 }
 
 /* Portrait layout (default) */

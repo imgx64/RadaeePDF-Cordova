@@ -79,6 +79,7 @@
     PDFPage *page = [doc page:self.m_pageno];
     [page objsStart];
     bool b = [page addAnnot:_hand];
+    NSLog(@"%d", b);
 }
 
 @end

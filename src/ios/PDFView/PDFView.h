@@ -51,7 +51,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 @end
 
-@interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate,UIPickerViewDelegate,UIPickerViewDataSource>
+@interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate>
 {
 #ifdef FTS_ENABLED
     FTSOccurrence *currentOccurrence;

@@ -81,6 +81,12 @@ extern NSString *g_author;
 {
     return [m_view getHeight] / m_scale;
 }
+
+- (BOOL)isCurlEnabled
+{
+    return NO;
+}
+
 -(void)vOpen:(PDFDoc *)doc :(id<PDFViewDelegate>)delegate
 {
     [self vClose];
@@ -583,7 +589,7 @@ extern NSString *g_author;
         float green = ((g_line_color>>8)&0xFF)/255.0f;
         float blue = (g_line_color&0xFF)/255.0f;
         float alpha = ((g_line_color>>24)&0xFF)/255.0f;
-        CGContextSetRGBFillColor(context, red, green, blue, alpha);
+        CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_lines;
         PDF_POINT *pt_end = m_lines + (m_lines_cnt<<1);
         if( m_lines_drawing ) pt_end += 2;
@@ -770,15 +776,8 @@ extern NSString *g_author;
     {
         m_doc = NULL;
         m_view = nil;
-        m_scale = [[UIScreen mainScreen] scale];
-        
-        if ([[UIScreen mainScreen] respondsToSelector:@selector(nativeScale)]) {
-            m_scale = [[UIScreen mainScreen] nativeScale]; //xcode6 ios8 sdk only
-        }
-        
-        //m_scale = [[UIScreen mainScreen] nativeScale]; //xcode6 ios8 sdk only
-        //m_scale = 3.0;  //test for iPhone6 Plus
-        //m_scale = [[UIScreen mainScreen] scale];
+        m_scale = [[UIScreen mainScreen] nativeScale]; //xcode6 ios8 sdk only
+
         m_zoom = 1;
         m_w = frame.size.width * m_scale;
         m_h = frame.size.height * m_scale;
@@ -1791,7 +1790,8 @@ extern NSString *g_author;
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
                 [mat transformPoint:pt_cur];
                 [mat transformPoint:&pt_cur[1]];
-                [page addAnnotLine:pt_cur :&pt_cur[1] :g_rect_Width :0 :1 :g_rect_color :g_rect_color];
+                // change 0 for arrow
+                [page addAnnotLine:pt_cur :&pt_cur[1] :0 :0 :g_line_Width :g_line_color :g_line_color];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -2178,6 +2178,7 @@ extern NSString *g_author;
             if (nu != -1){
                 
                 BOOL multi = [m_annot isMultiSel];
+                NSLog(@"%d", multi);
                 
                 NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
                 for (int i = 0; i < nu; i++) {
@@ -2273,6 +2274,7 @@ extern NSString *g_author;
 -(void)addIcon
 {
     BOOL b = [m_doc canSave];
+    NSLog(@"%d", b);
     
     PDFPageContent *content = [[PDFPageContent alloc] init];
     UIImage *img = [UIImage imageNamed:@"image"];
@@ -2292,6 +2294,7 @@ extern NSString *g_author;
     [form setContent:0 :0 :20 :20 :content];
     
     BOOL success = [m_annot setIcon2:@"image" :form];
+    NSLog(@"%d", success);
     content = nil;
 }
 /*
@@ -2386,7 +2389,7 @@ extern NSString *g_author;
     NSRegularExpression *expressionUrl = [NSRegularExpression regularExpressionWithPattern:@"(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))" options:NSRegularExpressionCaseInsensitive error:NULL];
     
     @try {
-        NSString *match = [s substringWithRange:[expressionUrl rangeOfFirstMatchInString:s options:NSMatchingCompleted range:NSMakeRange(0, [s length])]];
+        NSString *match = [s substringWithRange:[expressionUrl rangeOfFirstMatchInString:s options:NSMatchingReportCompletion range:NSMakeRange(0, [s length])]];
         //NSLog(@"%@", match);
         
         if (match.length > 0) {
@@ -2411,7 +2414,7 @@ extern NSString *g_author;
     NSRegularExpression *expressionMail = [NSRegularExpression regularExpressionWithPattern:@"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\[\\x01-\\x09\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])" options:NSRegularExpressionCaseInsensitive error:NULL];
     
     @try {
-        NSString *match = [s substringWithRange:[expressionMail rangeOfFirstMatchInString:s options:NSMatchingCompleted range:NSMakeRange(0, [s length])]];
+        NSString *match = [s substringWithRange:[expressionMail rangeOfFirstMatchInString:s options:NSMatchingReportCompletion range:NSMakeRange(0, [s length])]];
         //NSLog(@"%@", match);
         
         if (match.length > 0) {
@@ -2483,6 +2486,11 @@ extern NSString *g_author;
 - (void)setDoubleTapZoomMode:(int)mode
 {
     doubleTapZoomMode = mode;
+}
+
+- (CGImageRef)vGetImageForPage:(int)pg withSize:(CGSize)size withBackground:(BOOL)hasBackground
+{
+    return nil;
 }
 
 - (BOOL)isModified
