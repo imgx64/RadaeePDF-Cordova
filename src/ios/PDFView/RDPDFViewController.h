@@ -189,6 +189,7 @@
 - (void)drawNote;
 - (void)drawNoteDone;
 - (void)drawImage;
+- (void)drawImageWithImage:(UIImage *)image;
 - (void)drawImageDone;
 - (void)drawImageCancel;
 - (void)bookmarkList;

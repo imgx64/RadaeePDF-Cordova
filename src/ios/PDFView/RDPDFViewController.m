@@ -839,7 +839,18 @@ extern uint g_oval_color;
 
 - (void)drawImage
 {
-    if(![m_view vImageStart])
+    [self drawImageWithImage:nil];
+}
+
+- (void)drawImageWithImage:(UIImage *)image
+{
+    BOOL result;
+    if (image == nil) {
+        result = [m_view vImageStart];
+    } else {
+        result = [m_view vImageStartWithImage:image];
+    }
+    if(!result)
     {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");

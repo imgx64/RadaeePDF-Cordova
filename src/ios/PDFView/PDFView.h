@@ -60,6 +60,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     ActionStackManager *actionManger;
     
     UIImageView *imgAnnot;
+    UIImage *imgAnnotImg;
     
     BOOL readOnlyEnabled;
     BOOL autoSaveEnabled;
@@ -191,6 +192,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(void)vEllipseEnd;
 
 - (BOOL)vImageStart;
+- (BOOL)vImageStartWithImage:(UIImage *)image;
 - (void)vImageCancel;
 - (void)vImageEnd;
 

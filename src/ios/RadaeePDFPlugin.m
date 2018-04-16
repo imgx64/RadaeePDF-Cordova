@@ -1072,7 +1072,18 @@
 {
     self.cdv_command = command;
     
-    [m_pdf drawImage];
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    NSString *imageBase64 = [params objectForKey:@"image"];
+    
+    if (imageBase64 == nil) {
+        [m_pdf drawImage];
+    } else {
+        NSData *data = [[NSData alloc] initWithBase64EncodedString:imageBase64 options:0];
+        UIImage *image = [UIImage imageWithData:data];
+        [m_pdf drawImageWithImage:image];
+    }
+
 
     [self cdvOkWithMessage:@"success"];
 }

@@ -2650,6 +2650,21 @@ extern NSString *g_author;
     {
         self.scrollEnabled = false;
         m_status = sta_image;
+        imgAnnotImg = nil;
+        return true;
+    }
+    
+    return false;
+}
+
+- (BOOL)vImageStartWithImage:(UIImage *)image
+{
+    if( ![m_doc canSave] ) return false;
+    if( m_status == sta_none )
+    {
+        self.scrollEnabled = false;
+        m_status = sta_image;
+        imgAnnotImg = image;
         return true;
     }
     
@@ -2662,6 +2677,8 @@ extern NSString *g_author;
     {
         self.scrollEnabled = true;
         m_status = sta_none;
+        imgAnnotImg = nil;
+
         [self refresh];
     }
 }
@@ -2671,6 +2688,7 @@ extern NSString *g_author;
     {
         m_modified = true;
         m_status = sta_none;
+        imgAnnotImg = nil;
         
         [self refresh];
         
@@ -2682,7 +2700,11 @@ extern NSString *g_author;
 {
     if( m_status != sta_image ) return false;
     
-    imgAnnot = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"btn_add"]];
+    if (imgAnnotImg != nil) {
+        imgAnnot = [[UIImageView alloc] initWithImage:imgAnnotImg];
+    } else {
+        imgAnnot = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"btn_add"]];
+    }
     
     imgAnnot.center = CGPointMake(self.contentOffset.x + point.x - (imgAnnot.frame.size.width / 2), self.contentOffset.y + point.y  - (imgAnnot.frame.size.height / 2));
     

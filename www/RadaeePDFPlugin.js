@@ -116,7 +116,7 @@ addFunctionToPrototype('drawLinesEnd', []);
 addFunctionToPrototype('drawLinesCancel', []);
 addFunctionToPrototype('drawLinesSetColor', ['color']);
 addFunctionToPrototype('drawLinesSetWidth', ['width']);
-addFunctionToPrototype('drawStampStart', []);
+addFunctionToPrototype('drawStampStart', ['image']);
 addFunctionToPrototype('drawStampEnd', []);
 addFunctionToPrototype('drawStampCancel', []);
 addFunctionToPrototype('getAllAnnotations', []);
