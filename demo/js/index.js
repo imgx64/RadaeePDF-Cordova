@@ -91,7 +91,7 @@ var app = {
         }
         function didCloseReader() {
             console.log("--- Callback: didCloseReader");
-            app.showToolbar(null);
+            // app.showToolbar(null);
         }
         function didChangePage(page) {
             console.log("--- Callback: didChangePage: " + page);
@@ -301,6 +301,7 @@ var app = {
     close: function close(event) {
         RadaeePDFPlugin.close({}).then(function (message) {
             console.log("Success: " + message);
+            app.showToolbar(null);
         }).catch(function (err) {
             console.log("Failure: " + err);
         });
@@ -366,7 +367,7 @@ var app = {
     },
 
     share: function share(event) {
-        RadaeePDFPlugin.print({}).then(function (message) {
+        RadaeePDFPlugin.share({}).then(function (message) {
             console.log("Success: " + message);
         }).catch(function (err) {
             console.log("Failure: " + err);

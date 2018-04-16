@@ -708,6 +708,8 @@
     self.cdv_command = command;
     
     [m_pdf closeView];
+    
+    [self cdvOkWithMessage:@"success"];
 }
 
 - (void)hide:(CDVInvokedUrlCommand *)command
@@ -833,6 +835,15 @@
     self.cdv_command = command;
     
     [m_pdf printPdf];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)share:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf sharePdf];
     
     [self cdvOkWithMessage:@"success"];
 }
@@ -1093,6 +1104,27 @@
     [self cdvOkWithArray:annotations];
 }
 
+- (void)deleteAnnotation:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    int page = [[params objectForKey:@"page"] intValue];
+    int index = [[params objectForKey:@"index"] intValue];
+    [m_pdf removeAnnotationAt:page :index];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
+- (void)getOutline:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSArray *outline = [m_pdf getOutline];
+    
+    [self cdvOkWithArray:outline];
+}
 - (void)SelectedAnnotationDoAction:(CDVInvokedUrlCommand*)command
 {
     self.cdv_command = command;
@@ -1132,6 +1164,19 @@
     [self cdvOkWithMessage:@"success"];
 }
 
+- (void)getThumbnail:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    int page = [[params objectForKey:@"page"] intValue];
+    UIImage *image = [m_pdf getThumbnail:page];
+
+    NSString *base64 = [UIImagePNGRepresentation(image) base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+    
+    [self cdvOkWithMessage:base64];
+}
 #pragma mark - Bookmarks
 
 - (void)addToBookmarks:(CDVInvokedUrlCommand *)command
@@ -1557,9 +1602,6 @@
         [_delegate didCloseReader];
     }
     */
-
-    // For current 'close' success callback
-    [self cdvOkWithMessage:@"success"];
 
     [self cdvSendCallback:@"" orCommand:self.cdv_didCloseReader];
 }

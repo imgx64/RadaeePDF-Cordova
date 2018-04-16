@@ -1745,7 +1745,7 @@ extern uint g_oval_color;
 
 - (NSArray *)getAllAnnotations;
 {
-    NSMutableArray *arr = [[NSMutableArray new] init];
+    NSMutableArray *arr = [[NSMutableArray alloc] init];
     
     int pageCount = [m_doc pageCount];
     for (int pi = 0; pi < pageCount; pi++) {
@@ -1765,7 +1765,65 @@ extern uint g_oval_color;
         }
     }
     
-    return arr;
+    return [arr copy];
+}
+
+- (NSArray *)getOutline
+{
+    PDFOutline *outline = [m_doc rootOutline];
+
+    return [self getOutlineTree: outline];
+}
+
+- (NSArray *)getOutlineTree:(PDFOutline *)outline
+{
+    NSMutableArray *arr = [[NSMutableArray alloc] init];
+    
+    while( outline )
+    {
+        NSDictionary *dict;
+        if (outline.child) {
+            NSArray *children = [self getOutlineTree:outline.child];
+            
+            dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+             outline.label, @"label",
+             @(outline.dest), @"page",
+             children, @"children",
+             nil];
+        } else {
+            dict =
+            [[NSDictionary alloc] initWithObjectsAndKeys:
+             outline.label, @"label",
+             @(outline.dest), @"page",
+             nil];
+        }
+
+        [arr addObject:dict];
+        
+        outline = [outline next];
+    }
+    
+    return [arr copy];
+}
+
+- (UIImage *)getThumbnail:(int)pageno
+{
+    float scale = 1;
+    float w = [m_doc pageWidth:pageno];
+    float h = [m_doc pageHeight:pageno];
+    
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(w, h), YES, 1.0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    PDFVCache1 *thumb = [[PDFVCache1 alloc] init: m_doc :pageno :scale : w: h];
+    [thumb Render];
+    PDFVCanvas *canvas = [[PDFVCanvas alloc] init: context: scale];
+    [canvas DrawBmp:[thumb Bmp] :0 :0];
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
 }
 
 -(void)addannotToolBar
@@ -1803,6 +1861,11 @@ extern uint g_oval_color;
 -(void)removeannotToolBar
 {
     [annotToolBar removeFromSuperview];
+}
+
+-(void)removeAnnotationAt:(int)page :(int)index
+{
+    [m_view removeAnnotationAt:page :index];
 }
 
 - (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point
@@ -2580,6 +2643,23 @@ extern uint g_oval_color;
         
         [pic presentAnimated:YES completionHandler:completionHandler];
     }
+}
+
+- (void)sharePdf
+{
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:pdfPath]) {
+        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:@"Warning" message:@"PDF file not available"  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        [alter show];
+        return;
+    }
+    
+    NSData *myData = [NSData dataWithContentsOfFile:pdfPath];
+    
+    UIActivityViewController *avc = [[UIActivityViewController alloc] initWithActivityItems:[NSArray arrayWithObject:myData] applicationActivities:nil];
+    
+    [self presentViewController:avc animated:YES completion:nil];
+
 }
 
 #pragma mark - Save

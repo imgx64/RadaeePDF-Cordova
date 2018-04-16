@@ -2093,6 +2093,24 @@ extern NSString *g_author;
     return m_annot;
 }
 
+-(void)removeAnnotationAt:(int)pageno :(int)index
+{
+    if (![self canSaveDocument]) {
+        return;
+    }
+    [self setModified:YES force:NO];
+    
+    PDFAnnot *annot = [[m_doc page:pageno] annotAtIndex:index];
+    
+    //Action Stack Manger
+    PDFPage *page = [m_doc page:pageno];
+    [actionManger push:[[ASDel alloc] initWithPage:pageno page:page index:index]];
+    
+    [annot removeFromPage];
+    [m_view vRenderSync:pageno];
+    [self refresh];
+}
+
 -(void)onSingleTap:(float)x :(float)y
 {
     [self vGetTextFromPoint:CGPointMake(x, y)];

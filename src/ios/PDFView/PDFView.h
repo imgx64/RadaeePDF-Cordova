@@ -155,6 +155,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(void)vAnnotEnd;
 //get current annotation
 -(PDFAnnot *)vGetCurrentAnnot;
+-(void)removeAnnotationAt:(int)pageno :(int)index;
 
 //enter ink annotation status.
 -(bool)vNoteStart;

@@ -197,6 +197,7 @@
 - (void)redoAnnot;
 - (void)savePdf;
 - (void)printPdf;
+- (void)sharePdf;
 - (void)highlightText;
 - (void)underlineText;
 - (void)strikeText;
@@ -204,7 +205,10 @@
 - (void)performAnnot;
 - (void)deleteAnnot;
 - (void)annotCancel;
+- (void)removeAnnotationAt:(int)page :(int)index;
 - (NSArray *)getAllAnnotations;
+- (NSArray *)getOutline;
+- (UIImage *)getThumbnail:(int)pageno;
 
 - (IBAction)composeFile:(id) sender;
 - (IBAction)searchView:(id) sender;

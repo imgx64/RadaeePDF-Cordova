@@ -134,6 +134,7 @@
 - (void)redo:(CDVInvokedUrlCommand*)command;
 - (void)bookmarkCurrentPage:(CDVInvokedUrlCommand*)command;
 - (void)print:(CDVInvokedUrlCommand*)command;
+- (void)share:(CDVInvokedUrlCommand*)command;
 - (void)save:(CDVInvokedUrlCommand*)command;
 - (void)showViewModeMenu:(CDVInvokedUrlCommand*)command;
 
@@ -160,10 +161,13 @@
 - (void)drawStampEnd:(CDVInvokedUrlCommand*)command;
 - (void)drawStampCancel:(CDVInvokedUrlCommand*)command;
 - (void)getAllAnnotations:(CDVInvokedUrlCommand*)command;
+- (void)deleteAnnotation:(CDVInvokedUrlCommand*)command;
+- (void)getOutline:(CDVInvokedUrlCommand*)command;
 - (void)SelectedAnnotationDoAction:(CDVInvokedUrlCommand*)command;
 - (void)SelectedAnnotationDelete:(CDVInvokedUrlCommand*)command;
 - (void)SelectedAnnotationUnselect:(CDVInvokedUrlCommand*)command;
 - (void)gotoPage:(CDVInvokedUrlCommand*)command;
+- (void)getThumbnail:(CDVInvokedUrlCommand *)command;
 
 // Form Manager
 
