@@ -688,6 +688,15 @@
 
 #pragma mark - Actions
 
+- (void)allModesDone:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    [m_pdf allModesDone];
+    
+    [self cdvOkWithMessage:@"success"];
+}
+
 - (void)setTopSpace:(CDVInvokedUrlCommand*)command
 {
     self.cdv_command = command;

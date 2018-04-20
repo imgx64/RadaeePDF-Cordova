@@ -118,6 +118,7 @@
 - (void)renderAnnotToFile:(CDVInvokedUrlCommand *)command;
 
 // Actions
+- (void)allModesDone:(CDVInvokedUrlCommand *)command;
 - (void)setTopSpace:(CDVInvokedUrlCommand*)command;
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;

@@ -180,6 +180,7 @@
 @property (assign, nonatomic)int pagenow;
 @property (assign,nonatomic) PopupMenu* popupMenu;
 
+- (void)allModesDone;
 - (void)closeView;
 - (void)showViewModeTableView;
 - (void)showDrawModeTableView;

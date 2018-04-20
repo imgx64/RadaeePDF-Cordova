@@ -116,8 +116,12 @@ var app = {
         }
         function didTapOnAnnotationOfType(info) {
             console.log("--- Callback: didTapOnAnnotationOfType: " + info['type'] + " and index: " + info['index']);
-            app.showEditToolbar('img/edit-annotation.png', RadaeePDFPlugin.SelectedAnnotationUnselect,
-                RadaeePDFPlugin.SelectedAnnotationDelete, null, null, RadaeePDFPlugin.SelectedAnnotationDoAction);
+            if (info.type == 1) {
+                RadaeePDFPlugin.SelectedAnnotationDoAction();
+            } else {
+                app.showEditToolbar('img/edit-annotation.png',
+                    RadaeePDFPlugin.SelectedAnnotationDelete, null, null, RadaeePDFPlugin.SelectedAnnotationDoAction);
+            }
         }
         function didUnselectAnnotation() {
             console.log("--- Callback: didUnselectAnnotation");
@@ -204,7 +208,7 @@ var app = {
         });
     },
 
-    showEditToolbar: function showEditToolbar(img, editDoneFunc, editCancelFunc,
+    showEditToolbar: function showEditToolbar(img, editCancelFunc,
         widthChangeFunc, colorChangeFunc, annotationTextFunc) {
         app.showToolbar('edit-toolbar');
 
@@ -215,7 +219,6 @@ var app = {
             app.hide('edit-img');
         }
 
-        app.editDoneFunc = editDoneFunc;
         app.editCancelFunc = editCancelFunc;
         app.widthChangeFunc = widthChangeFunc;
         app.colorChangeFunc = colorChangeFunc;
@@ -416,7 +419,7 @@ var app = {
     thinMarker: function thinMarker(event) {
         RadaeePDFPlugin.drawFreeformStart();
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.drawFreeformEnd, RadaeePDFPlugin.drawFreeformCancel,
+        app.showEditToolbar(img, RadaeePDFPlugin.drawFreeformCancel,
             RadaeePDFPlugin.drawFreeformSetWidth, RadaeePDFPlugin.drawFreeformSetColor);
     },
 
@@ -426,25 +429,25 @@ var app = {
     annotateBox: function annotateBox(event) {
         RadaeePDFPlugin.drawNoteStart();
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.drawNoteEnd, null, null, null);
+        app.showEditToolbar(img, null, null, null);
     },
 
     textHighlighter: function textHighlighter(event) {
         RadaeePDFPlugin.modifyTextHighlightStart();
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.modifyTextEnd, null, null, RadaeePDFPlugin.modifyTextHighlightSetColor);
+        app.showEditToolbar(img, null, null, RadaeePDFPlugin.modifyTextHighlightSetColor);
     },
 
     underline: function underline(event) {
         RadaeePDFPlugin.modifyTextUnderlineStart();
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.modifyTextEnd, null, null, RadaeePDFPlugin.modifyTextUnderlineSetColor);
+        app.showEditToolbar(img, null, null, RadaeePDFPlugin.modifyTextUnderlineSetColor);
     },
 
     strikeout: function strikeout(event) {
         RadaeePDFPlugin.modifyTextStriketrhoughStart();
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.modifyTextEnd, null, null, RadaeePDFPlugin.modifyTextStriketrhoughSetColor);
+        app.showEditToolbar(img, null, null, RadaeePDFPlugin.modifyTextStriketrhoughSetColor);
     },
 
     flatText: function flatText(event) {
@@ -462,14 +465,14 @@ var app = {
     straightLine: function straightLine(event) {
         RadaeePDFPlugin.drawLinesStart();
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.drawLinesEnd, RadaeePDFPlugin.drawLinesCancel,
+        app.showEditToolbar(img, RadaeePDFPlugin.drawLinesCancel,
             RadaeePDFPlugin.drawLinesSetWidth, RadaeePDFPlugin.drawLinesSetColor);
     },
 
     stamp: function stamp(event) {
         RadaeePDFPlugin.drawStampStart();
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.drawStampEnd, RadaeePDFPlugin.drawStampCancel, null, null);
+        app.showEditToolbar(img, RadaeePDFPlugin.drawStampCancel, null, null);
     },
 
     signature: function signature(event) {
@@ -619,7 +622,7 @@ var app = {
                 "gWQgGUgGkoFkIBlIBpKBZCAZSAaSgWQgGUgGkoEaMfD/TkViyf+BZ10AAAAASUVORK5CYII=",
         });
         var img = event.target && event.target.src;
-        app.showEditToolbar(img, RadaeePDFPlugin.drawStampEnd, RadaeePDFPlugin.drawStampCancel, null, null);
+        app.showEditToolbar(img, RadaeePDFPlugin.drawStampCancel, null, null);
     },
 
     voiceNote: function voiceNote(event) {
@@ -676,7 +679,7 @@ var app = {
 
     apply: function apply(event) {
         app.showToolbar('main-toolbar');
-        app.editDoneFunc && app.editDoneFunc();
+        RadaeePDFPlugin.allModesDone();
     },
 };
 

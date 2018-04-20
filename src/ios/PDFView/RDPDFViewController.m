@@ -406,6 +406,30 @@ extern uint g_oval_color;
     }
 }
 
+- (void)allModesDone
+{
+    if ([_drawRectToolBar superview] != nil) {
+        [self drawRowDone];
+        [self drawImageDone];
+    }
+    
+    if (b_noteAnnot) {
+        [self drawNoteDone];
+    }
+    
+    if ([_drawLineToolBar superview] != nil) {
+        [self drawLineDone:nil];
+    }
+    
+    if (onSelectAction != SELECT_DO_NOTHING) {
+        [self modifyTextDone];
+    }
+
+    if (_m_searchBar != nil) {
+        [self searchCancel:nil];
+    }
+}
+
 - (void)closeView
 {
     if ([m_view isModified] && !autoSave) {
@@ -508,6 +532,7 @@ extern uint g_oval_color;
 
 - (IBAction)searchView:(id) sender
 {
+    [self allModesDone];
     _searchToolBar = [UIToolbar new];
     [_searchToolBar sizeToFit];
     
@@ -671,6 +696,7 @@ extern uint g_oval_color;
 
 - (IBAction)drawLine:(id) sender
 {
+    [self allModesDone];
     if(![m_view vInkStart])
     {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
@@ -712,6 +738,7 @@ extern uint g_oval_color;
 
 - (void)drawRow
 {
+    [self allModesDone];
     if(![m_view vLineStart])
     {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
@@ -844,6 +871,7 @@ extern uint g_oval_color;
 
 - (void)drawImageWithImage:(UIImage *)image
 {
+    [self allModesDone];
     BOOL result;
     if (image == nil) {
         result = [m_view vImageStart];
@@ -891,6 +919,7 @@ extern uint g_oval_color;
 }
 
 - (void)drawNote {
+    [self allModesDone];
     b_noteAnnot = YES;
 }
 
@@ -899,16 +928,19 @@ extern uint g_oval_color;
 }
 
 - (void)highlightText {
+    [self allModesDone];
     [self enableSelection];
     onSelectAction = SELECT_DO_HIGHLIGHT;
 }
 
 - (void)underlineText {
+    [self allModesDone];
     [self enableSelection];
     onSelectAction = SELECT_DO_UNDERLINE;
 }
 
 - (void)strikeText {
+    [self allModesDone];
     [self enableSelection];
     onSelectAction = SELECT_DO_STRIKE;
 }

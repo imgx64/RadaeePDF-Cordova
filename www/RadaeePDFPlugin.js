@@ -1,4 +1,3 @@
-cordova.define("com.radaee.cordova.RadaeePDFPlugin", function (require, exports, module) {
 'use strict';
 //  RadaeePDFPlugin
 //  GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
@@ -78,6 +77,7 @@ addFunctionToPrototype('activateLicense', ['licenseType', 'company', 'email', 'k
 addFunctionToPrototype('show', ['url', 'author', 'password', 'gotoPage', 'readOnlyMode', 'automaticSave'], 'open');
 addFunctionToPrototype('openFromAssets', ['url', 'author', 'password', 'gotoPage', 'readOnlyMode', 'automaticSave']);
 
+addFunctionToPrototype('allModesDone', []);
 addFunctionToPrototype('setTopSpace', ['topSpace']);
 addFunctionToPrototype('close', []);
 addFunctionToPrototype('hide', []);
@@ -165,5 +165,3 @@ addCallbackToPrototype('didTapOnAnnotationOfTypeCallback');
 addCallbackToPrototype('didUnselectAnnotationCallback');
 
 module.exports = new RadaeePDFPlugin();
-
-});
