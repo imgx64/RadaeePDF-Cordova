@@ -490,19 +490,16 @@ extern uint g_oval_color;
     b.items = [RadaeePDFPlugin loadBookmarkForPdf:pdfPath withPath:YES];
     b.delegate = self;
     
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        
-        bookmarkPopover = [[UIPopoverController alloc] initWithContentViewController:b];
-        bookmarkPopover.popoverContentSize = CGSizeMake(300, 44 * b.items.count);
-        
-        [bookmarkPopover presentPopoverFromBarButtonItem:_moreButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-    }
-    else
-    {
-        b_outline = true;
-        UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:b];
-        [self presentViewController:nav animated:YES completion:nil];
-    }
+    b_outline = true;
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:b];
+    
+    nav.popoverPresentationController.sourceView = self.view;
+    CGRect rect = self.view.frame;
+    nav.popoverPresentationController.sourceRect = CGRectMake(rect.origin.x, rect.origin.y, 0, 0);
+    nav.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionUp;
+    
+    [self presentViewController:nav animated:YES completion:nil];
+    
 }
 
 -(void)didSelectItem:(int)pageno {
@@ -2700,6 +2697,11 @@ extern uint g_oval_color;
     NSData *myData = [NSData dataWithContentsOfFile:pdfPath];
     
     UIActivityViewController *avc = [[UIActivityViewController alloc] initWithActivityItems:[NSArray arrayWithObject:myData] applicationActivities:nil];
+    
+    avc.popoverPresentationController.sourceView = self.view;
+    CGRect rect = self.view.frame;
+    avc.popoverPresentationController.sourceRect = CGRectMake(rect.origin.x, rect.origin.y, 0, 0);
+    avc.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionUp;
     
     [self presentViewController:avc animated:YES completion:nil];
 
