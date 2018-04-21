@@ -11,6 +11,7 @@
 #import "RDExtendedSearch.h"
 #import "SearchResultTableViewController.h"
 #import <AVKit/AVKit.h>
+#import <MobileCoreServices/MobileCoreServices.h>
 #import "ViewModeTableViewController.h"
 #import "DrawModeTableViewController.h"
 #import "SignatureViewController.h"
@@ -2695,8 +2696,9 @@ extern uint g_oval_color;
     }
     
     NSData *myData = [NSData dataWithContentsOfFile:pdfPath];
+    UIActivityItemProvider *source = [[PDFItemProvider alloc] initWithPlaceholderItem:myData];
     
-    UIActivityViewController *avc = [[UIActivityViewController alloc] initWithActivityItems:[NSArray arrayWithObject:myData] applicationActivities:nil];
+    UIActivityViewController *avc = [[UIActivityViewController alloc] initWithActivityItems:[NSArray arrayWithObject:source] applicationActivities:nil];
     
     avc.popoverPresentationController.sourceView = self.view;
     CGRect rect = self.view.frame;
@@ -2835,4 +2837,19 @@ extern uint g_oval_color;
 - (void)moviePlayedDidFinish:(NSNotification *)notification
 {
 }
+@end
+
+
+@implementation PDFItemProvider
+
+- (id)item
+{
+    return self.placeholderItem;
+}
+
+- (NSString *)activityViewController:(UIActivityViewController *)activityViewController dataTypeIdentifierForActivityType:(UIActivityType)activityType
+{
+    return kUTTypePDF;
+}
+
 @end

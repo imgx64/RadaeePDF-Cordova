@@ -273,3 +273,7 @@
 - (void)moviePlayedDidFinish:(NSNotification *)notification;
 //END
 @end
+
+@interface PDFItemProvider : UIActivityItemProvider
+
+@end
