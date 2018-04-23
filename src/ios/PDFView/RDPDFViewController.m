@@ -606,8 +606,9 @@ extern uint g_oval_color;
         
         UIPopoverPresentationController *pop = vm.popoverPresentationController;
         pop.permittedArrowDirections = UIPopoverArrowDirectionUp;
-        pop.barButtonItem = _drawButton;
-        
+        pop.sourceView = self.view;
+        CGRect rect = self.view.frame;
+        pop.sourceRect = CGRectMake(rect.origin.x, rect.origin.y, 0, 0);        
         [self presentViewController:vm animated:YES completion:nil];
     }
     else
