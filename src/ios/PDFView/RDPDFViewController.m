@@ -1792,6 +1792,10 @@ extern uint g_oval_color;
     int pageCount = [m_doc pageCount];
     for (int pi = 0; pi < pageCount; pi++) {
         PDFPage *page = [m_doc page:pi];
+        PDFDIB *dib = [[PDFDIB alloc] init:1 :1];
+        [page renderPrepare:dib];
+        PDFMatrix *mat = [[PDFMatrix alloc] init:1: -1: 0: 1];
+        [page render:dib :mat :mode_normal];
         int annotCount = [page annotCount];
         for (int ai = 0; ai < annotCount; ai++) {
             PDFAnnot *annot = [page annotAtIndex:ai];
